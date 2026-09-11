@@ -1,0 +1,20 @@
+# macOS metadata
+.DS_Store
+._*
+.Spotlight-V100
+.Trashes
+
+# Large OS Disk Images (>100MB, cannot be committed to Git)
+out/*.raw
+out/*.img
+!out/boot.img
+out/*.sparse.img
+
+# Temporary build & log files
+*.log
+*.tmp
+__pycache__/
+*.pyc
+
+# Local Lima VM scratch
+scratch/
