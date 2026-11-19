@@ -1,7 +1,7 @@
 
 name: Build rootfs sony-keyaki
 
-on:
+"on":
   workflow_dispatch:
 
 jobs:
