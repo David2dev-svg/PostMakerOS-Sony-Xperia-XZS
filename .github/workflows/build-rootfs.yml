@@ -22,10 +22,16 @@ jobs:
     
       - name: Configurar pmbootstrap
         run: |
-          pmbootstrap --version
-          pmbootstrap config aports "$HOME/pmaports"
-          pmbootstrap config device sony-keyaki
-          pmbootstrap config ui console
+          mkdir -p "$HOME/.config"
+          cat > "$HOME/.config/pmbootstrap_v3.cfg" <<EOF
+          [pmbootstrap]
+          aports = $HOME/pmaports
+          device = sony-keyaki
+          ui = console
+          user = user
+          work = $HOME/.local/var/pmbootstrap
+          EOF
+          pmbootstrap status
 
       - name: Gerar o rootfs
         run: |
