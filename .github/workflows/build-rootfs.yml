@@ -13,13 +13,30 @@ jobs:
 
       - name: Instalar dependencias
         run: |
-          sudo apt-get update
-          sudo apt-get install -y qemu-user-binfmt binfmt-support android-sdk-libsparse-utils git openssl
+          for i in 1 2 3 4 5; do
+            sudo apt-get update && \
+            sudo apt-get install -y -o Acquire::Retries=5 qemu-user-binfmt binfmt-support android-sdk-libsparse-utils git openssl && break
+            [ "$i" = 5 ] && exit 1
+            echo "apt falhou, tentando de novo em 30s ($i/5)"
+            sleep 30
+          done
           git clone --depth=1 https://gitlab.postmarketos.org/postmarketOS/pmbootstrap.git "$HOME/pmbootstrap"
           mkdir -p "$HOME/.local/bin"
           ln -s "$HOME/pmbootstrap/pmbootstrap.py" "$HOME/.local/bin/pmbootstrap"
           echo "$HOME/.local/bin" >> "$GITHUB_PATH"
-    
+
+      - name: Clonar pmaports e adicionar o device
+        run: |
+          git clone --depth 1 https://gitlab.postmarketos.org/postmarketOS/pmaports.git "$HOME/pmaports"
+          ls "$HOME/pmaports/pmaports.cfg"
+          echo "Conteudo da pasta pmaports do projeto:"
+          ls -la pmaports
+          DEST="$HOME/pmaports/device/testing/device-sony-keyaki"
+          mkdir -p "$DEST"
+          cp -r pmaports/. "$DEST/"
+          grep -q rootfs_image_sector_size "$DEST/deviceinfo" || echo 'deviceinfo_rootfs_image_sector_size="4096"' >> "$DEST/deviceinfo"
+          cat "$DEST/deviceinfo"
+
       - name: Configurar pmbootstrap
         run: |
           mkdir -p "$HOME/.config"
@@ -41,7 +58,7 @@ jobs:
         run: |
           IMG=$(find "$HOME/.local/var/pmbootstrap" -name 'sony-keyaki.img' -type f | head -n1)
           if [ -z "$IMG" ]; then
-            echo "Imagem sony-keyaki.img não encontrada!"
+            echo "Imagem sony-keyaki.img nao encontrada!"
             exit 1
           fi
           mkdir -p out-build
@@ -55,3 +72,4 @@ jobs:
           name: sony-keyaki-rootfs
           path: out-build/sony-keyaki.sparse.img
           retention-days: 7
+          
