@@ -1,15 +1,10 @@
 
-name: Build rootfs sony-keyaki
+name: Build RootFS
 
-"on":
-  workflow_dispatch:
+on: [push, workflow_dispatch]
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Test
-        run: echo "Workflow reconhecido!"
+      - run: echo "Workflow funcionando!"
