@@ -7,34 +7,19 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 120
 
-    steps:
+        steps:
       - name: Checkout do projeto
         uses: actions/checkout@v4
 
-      - name: Configurar pmbootstrap
+      - name: Instalar dependencias
         run: |
-          export PATH="$HOME/.local/bin:$PATH"
-          ls -l "$HOME/.local/bin" "$HOME/pmbootstrap/pmbootstrap.py"
-          mkdir -p "$HOME/.config"
-          cat > "$HOME/.config/pmbootstrap_v3.cfg" <<EOF
-          [pmbootstrap]
-          aports = $HOME/pmaports
-          device = sony-keyaki
-          ui = console
-          user = user
-          work = $HOME/.local/var/pmbootstrap
-          EOF
-          pmbootstrap status
-
-      - name: Clonar pmaports e adicionar o device
-        run: |
-          git clone --depth 1 https://gitlab.postmarketos.org/postmarketOS/pmaports.git "$HOME/pmaports"
-          DEST="$HOME/pmaports/device/testing/device-sony-keyaki"
-          mkdir -p "$DEST"
-          cp -r pmaports/. "$DEST/"
-          grep -q rootfs_image_sector_size "$DEST/deviceinfo" || echo 'deviceinfo_rootfs_image_sector_size="4096"' >> "$DEST/deviceinfo"
-          cat "$DEST/deviceinfo"
-
+          sudo apt-get update
+          sudo apt-get install -y qemu-user-binfmt binfmt-support android-sdk-libsparse-utils git openssl
+          git clone --depth=1 https://gitlab.postmarketos.org/postmarketOS/pmbootstrap.git "$HOME/pmbootstrap"
+          mkdir -p "$HOME/.local/bin"
+          ln -s "$HOME/pmbootstrap/pmbootstrap.py" "$HOME/.local/bin/pmbootstrap"
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+    
       - name: Configurar pmbootstrap
         run: |
           pmbootstrap --version
