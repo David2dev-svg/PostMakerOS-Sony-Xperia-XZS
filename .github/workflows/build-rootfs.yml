@@ -37,6 +37,9 @@ jobs:
           DEST="$HOME/pmaports/device/testing/device-sony-keyaki"
           mkdir -p "$DEST"
           cp -r pmaports/. "$DEST/"
+          sed -i -E 's/^(# Maintainer: ).*/\1Seu Nome <email@example.com>/I' "$DEST/APKBUILD"
+          sed -i -E 's/^maintainer=.*/maintainer="Seu Nome <email@example.com>"/' "$DEST/APKBUILD"
+          head -n 15 "$DEST/APKBUILD"
           grep -q rootfs_image_sector_size "$DEST/deviceinfo" || echo 'deviceinfo_rootfs_image_sector_size="4096"' >> "$DEST/deviceinfo"
           cat "$DEST/deviceinfo"
 
