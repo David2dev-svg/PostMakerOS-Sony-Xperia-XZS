@@ -13,6 +13,8 @@ jobs:
 
       - name: Configurar pmbootstrap
         run: |
+          export PATH="$HOME/.local/bin:$PATH"
+          ls -l "$HOME/.local/bin" "$HOME/pmbootstrap/pmbootstrap.py"
           mkdir -p "$HOME/.config"
           cat > "$HOME/.config/pmbootstrap_v3.cfg" <<EOF
           [pmbootstrap]
