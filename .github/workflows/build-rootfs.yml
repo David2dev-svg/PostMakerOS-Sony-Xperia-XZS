@@ -1,69 +1,12 @@
-
 name: Build rootfs sony-keyaki
 
-on: [push, workflow_dispatch]
+"on":
+  push:
+  workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 120
     steps:
-      - name: Checkout do projeto
-        uses: actions/checkout@v4
-
-  - name: Instalar dependencias
-    run: |
-      sudo apt-get update
-      sudo apt-get install -y qemu-user-static binfmt-support android-sdk-libsparse-utils git python3-venv
-
-      python3 -m venv "$HOME/pmbootstrap-venv"
-      "$HOME/pmbootstrap-venv/bin/pip" install pmbootstrap
-      echo "$HOME/pmbootstrap-venv/bin" >> "$GITHUB_PATH"
-
-  - name: Clonar pmaports e adicionar o device
-    run: |
-      git clone --depth 1 https://gitlab.postmarketos.org/postmarketOS/pmaports.git "$HOME/pmaports"
-
-      DEST="$HOME/pmaports/device/testing/device-sony-keyaki"
-      mkdir -p "$DEST"
-
-      cp -r pmaports/. "$DEST/"
-
-      grep -q rootfs_image_sector_size "$DEST/deviceinfo" || \
-        echo 'deviceinfo_rootfs_image_sector_size="4096"' >> "$DEST/deviceinfo"
-
-      cat "$DEST/deviceinfo"
-
-  - name: Configurar pmbootstrap
-    run: |
-      pmbootstrap --version
-      pmbootstrap config aports "$HOME/pmaports"
-      pmbootstrap config device sony-keyaki
-      pmbootstrap config ui console
-
-  - name: Gerar o rootfs
-    run: |
-      pmbootstrap -y install --no-fde --password pmos
-
-  - name: Converter para sparse
-    run: |
-      IMG=$(find "$HOME/.local/var/pmbootstrap" -name 'sony-keyaki.img' -type f | head -n1)
-
-      if [ -z "$IMG" ]; then
-        echo "Imagem sony-keyaki.img não encontrada!"
-        exit 1
-      fi
-
-      mkdir -p out-build
-      cp "$IMG" out-build/sony-keyaki.raw
-
-      img2simg out-build/sony-keyaki.raw out-build/sony-keyaki.sparse.img
-
-      ls -lh out-build
-
-  - name: Publicar artefato
-    uses: actions/upload-artifact@v4
-    with:
-      name: sony-keyaki-rootfs
-      path: out-build/sony-keyaki.sparse.img
-      retention-days: 7
+      - name: Teste
+        run: echo "YAML funcionando"
