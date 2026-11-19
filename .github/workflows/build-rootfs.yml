@@ -39,7 +39,8 @@ jobs:
 
       - name: Configurar pmbootstrap
         run: |
-          mkdir -p "$HOME/.local/var/pmbootstrap"
+          mkdir -p "$HOME/.local/var/pmbootstrap/cache_git"
+          echo 8 > "$HOME/.local/var/pmbootstrap/version"
           mkdir -p "$HOME/.config"
           cat > "$HOME/.config/pmbootstrap_v3.cfg" <<EOF
           [pmbootstrap]
@@ -50,7 +51,7 @@ jobs:
           work = $HOME/.local/var/pmbootstrap
           EOF
           pmbootstrap status
-
+          
       - name: Gerar o rootfs
         run: |
           pmbootstrap -t 3000 -y install --no-fde --password pmos
