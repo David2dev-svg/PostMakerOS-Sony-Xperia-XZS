@@ -11,13 +11,14 @@ jobs:
       - name: Checkout do projeto
         uses: actions/checkout@v4
 
-      - name: Instalar dependencias
+            - name: Instalar dependencias
         run: |
           sudo apt-get update
-          sudo apt-get install -y qemu-user-static binfmt-support android-sdk-libsparse-utils git python3-venv
-          python3 -m venv "$HOME/pmbootstrap-venv"
-          "$HOME/pmbootstrap-venv/bin/pip" install pmbootstrap
-          echo "$HOME/pmbootstrap-venv/bin" >> "$GITHUB_PATH"
+          sudo apt-get install -y qemu-user-binfmt binfmt-support android-sdk-libsparse-utils git openssl
+          git clone --depth=1 https://gitlab.postmarketos.org/postmarketOS/pmbootstrap.git "$HOME/pmbootstrap"
+          mkdir -p "$HOME/.local/bin"
+          ln -s "$HOME/pmbootstrap/pmbootstrap.py" "$HOME/.local/bin/pmbootstrap"
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
 
       - name: Clonar pmaports e adicionar o device
         run: |
