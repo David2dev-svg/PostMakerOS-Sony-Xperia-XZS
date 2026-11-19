@@ -39,6 +39,7 @@ jobs:
 
       - name: Configurar pmbootstrap
         run: |
+          mkdir -p "$HOME/.local/var/pmbootstrap"
           mkdir -p "$HOME/.config"
           cat > "$HOME/.config/pmbootstrap_v3.cfg" <<EOF
           [pmbootstrap]
