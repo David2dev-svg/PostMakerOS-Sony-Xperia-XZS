@@ -11,7 +11,7 @@ jobs:
       - name: Checkout do projeto
         uses: actions/checkout@v4
 
-            - name: Instalar dependencias
+      - name: Instalar dependencias
         run: |
           sudo apt-get update
           sudo apt-get install -y qemu-user-binfmt binfmt-support android-sdk-libsparse-utils git openssl
