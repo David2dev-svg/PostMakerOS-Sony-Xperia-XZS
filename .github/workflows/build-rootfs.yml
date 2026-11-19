@@ -29,7 +29,7 @@ jobs:
 
       - name: Clonar pmaports e adicionar o device
         run: |
-          git clone --depth 1 https://gitlab.postmarketos.org/postmarketOS/pmaports.git "$HOME/pmaports"
+          git clone --depth 1 --branch v26.06 https://gitlab.postmarketos.org/postmarketOS/pmaports.git "$HOME/pmaports"
           ls "$HOME/pmaports/pmaports.cfg"
           echo "Conteudo da pasta pmaports do projeto:"
           ls -la pmaports
