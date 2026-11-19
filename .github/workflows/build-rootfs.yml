@@ -11,7 +11,7 @@ jobs:
       - name: Checkout do projeto
         uses: actions/checkout@v4
 
-            - name: Configurar pmbootstrap
+      - name: Configurar pmbootstrap
         run: |
           mkdir -p "$HOME/.config"
           cat > "$HOME/.config/pmbootstrap_v3.cfg" <<EOF
