@@ -1,4 +1,3 @@
-
 name: Build rootfs sony-keyaki
 
 on: [push, workflow_dispatch]
@@ -15,8 +14,7 @@ steps:
   - name: Instalar dependencias
     run: |
       sudo apt-get update
-      sudo apt-get install -y qemu-user-static binfmt-support \
-        android-sdk-libsparse-utils git python3-venv
+      sudo apt-get install -y qemu-user-static binfmt-support android-sdk-libsparse-utils git python3-venv
 
       python3 -m venv "$HOME/pmbootstrap-venv"
       "$HOME/pmbootstrap-venv/bin/pip" install pmbootstrap
@@ -24,13 +22,11 @@ steps:
 
   - name: Clonar pmaports e adicionar o device
     run: |
-      git clone --depth 1 \
-        https://gitlab.postmarketos.org/postmarketOS/pmaports.git \
-        "$HOME/pmaports"
+      git clone --depth 1 https://gitlab.postmarketos.org/postmarketOS/pmaports.git "$HOME/pmaports"
 
       DEST="$HOME/pmaports/device/testing/device-sony-keyaki"
-
       mkdir -p "$DEST"
+
       cp -r pmaports/. "$DEST/"
 
       grep -q rootfs_image_sector_size "$DEST/deviceinfo" || \
@@ -51,21 +47,17 @@ steps:
 
   - name: Converter para sparse
     run: |
-      IMG=$(find "$HOME/.local/var/pmbootstrap" \
-        -name 'sony-keyaki.img' -type f | head -n1)
+      IMG=$(find "$HOME/.local/var/pmbootstrap" -name 'sony-keyaki.img' -type f | head -n1)
 
       if [ -z "$IMG" ]; then
         echo "Imagem sony-keyaki.img não encontrada!"
         exit 1
       fi
 
-      echo "Imagem: $IMG"
-
       mkdir -p out-build
       cp "$IMG" out-build/sony-keyaki.raw
 
-      img2simg out-build/sony-keyaki.raw \
-        out-build/sony-keyaki.sparse.img
+      img2simg out-build/sony-keyaki.raw out-build/sony-keyaki.sparse.img
 
       ls -lh out-build
 
