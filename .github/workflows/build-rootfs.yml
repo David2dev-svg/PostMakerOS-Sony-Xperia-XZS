@@ -77,7 +77,7 @@ jobs:
           path: out-build/sony-keyaki.sparse.img
           retention-days: 7
           
-      - name: Mostrar log do pmbootstrap se falhar
+      - name: Mostrar erros do pmbootstrap se falhar
         if: failure()
         run: |
-          tail -n 120 "$HOME/.local/var/pmbootstrap/log.txt"
+          grep -n -B3 -A1 "ERROR:" "$HOME/.local/var/pmbootstrap/log.txt" | head -n 80
