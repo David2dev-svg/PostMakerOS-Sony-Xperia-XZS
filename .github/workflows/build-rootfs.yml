@@ -51,6 +51,7 @@ jobs:
           ui = console
           user = user
           work = $HOME/.local/var/pmbootstrap
+          is_default_channel = False
           EOF
           pmbootstrap status
           
@@ -80,4 +81,5 @@ jobs:
       - name: Mostrar erros do pmbootstrap se falhar
         if: failure()
         run: |
-          grep -n -B3 -A1 "ERROR:" "$HOME/.local/var/pmbootstrap/log.txt" | head -n 80
+          grep -n -B3 -A1 "ERROR:" "$HOME/.local/var/pmbootstrap/log.txt" | head -n 60
+          sudo ls -la "$HOME/.local/var/pmbootstrap/chroot_rootfs_sony-keyaki" "$HOME/.local/var/pmbootstrap/chroot_rootfs_sony-keyaki/usr" | head -n 60
