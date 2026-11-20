@@ -15,7 +15,7 @@ jobs:
         run: |
           for i in 1 2 3 4 5; do
             sudo apt-get update && \
-            sudo apt-get install -y -o Acquire::Retries=5 gcc-aarch64-linux-gnu build-essential bc flex bison \
+            sudo apt-get install -y -o Acquire::Retries=5 gcc-aarch64-linux-gnu build-essential clang lld llvm bc flex bison \
               libssl-dev libelf-dev dwarves xz-utils zstd cpio kmod curl && break
             [ "$i" = 5 ] && exit 1
             sleep 30
@@ -41,14 +41,14 @@ jobs:
           ./scripts/config --enable WLAN_VENDOR_BROADCOM
           ./scripts/config --module BRCMFMAC
           ./scripts/config --enable BRCMFMAC_PCIE
-          make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- olddefconfig
-          grep -E "BRCM|WLAN_VENDOR_BROADCOM|CONFIG_WLAN=" .config
+          make ARCH=arm64 LLVM=1 olddefconfig
+          grep -E "CONFIG_CC_IS_CLANG|CONFIG_CLANG_VERSION|CONFIG_CFI" .config
 
       - name: Compilar
         run: |
           cd linux
-          make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- -j"$(nproc)" Image modules
-
+          make ARCH=arm64 LLVM=1 -j"$(nproc)" Image modules
+          
       - name: Coletar os modulos
         run: |
           mkdir -p out-mods
