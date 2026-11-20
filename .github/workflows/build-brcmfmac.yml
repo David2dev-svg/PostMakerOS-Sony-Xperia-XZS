@@ -1,0 +1,69 @@
+name: Build brcmfmac modules 6.19.5
+
+on: workflow_dispatch
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 150
+
+    steps:
+      - name: Checkout do projeto
+        uses: actions/checkout@v4
+
+      - name: Dependencias
+        run: |
+          for i in 1 2 3 4 5; do
+            sudo apt-get update && \
+            sudo apt-get install -y -o Acquire::Retries=5 gcc-aarch64-linux-gnu build-essential bc flex bison \
+              libssl-dev libelf-dev dwarves xz-utils zstd cpio kmod curl && break
+            [ "$i" = 5 ] && exit 1
+            sleep 30
+          done
+
+      - name: Baixar o kernel 6.19.5
+        run: |
+          curl -fL -o linux.tar.xz https://cdn.kernel.org/pub/linux/kernel/v6.x/linux-6.19.5.tar.xz
+          tar -xf linux.tar.xz
+          mv linux-6.19.5 linux
+
+      - name: Extrair o .config do kernel que roda no aparelho
+        run: |
+          cd linux
+          ./scripts/extract-ikconfig ../out/vmlinuz > .config
+          wc -l .config
+          grep -E "^CONFIG_LOCALVERSION|MODVERSIONS|MODULE_SIG|MODULE_COMPRESS|CFG80211=|PCIE_QCOM=" .config
+
+      - name: Ativar o brcmfmac
+        run: |
+          cd linux
+          ./scripts/config --enable WLAN
+          ./scripts/config --enable WLAN_VENDOR_BROADCOM
+          ./scripts/config --module BRCMFMAC
+          ./scripts/config --enable BRCMFMAC_PCIE
+          make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- olddefconfig
+          grep -E "BRCM|WLAN_VENDOR_BROADCOM|CONFIG_WLAN=" .config
+
+      - name: Compilar
+        run: |
+          cd linux
+          make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- -j"$(nproc)" Image modules
+
+      - name: Coletar os modulos
+        run: |
+          mkdir -p out-mods
+          find linux/drivers/net/wireless/broadcom -name '*.ko' -exec cp -v {} out-mods/ \;
+          cd out-mods
+          for f in *.ko; do
+            echo "== $f"
+            modinfo -F vermagic "$f"
+            modinfo -F depends "$f"
+          done
+          ls -lh
+
+      - name: Publicar
+        uses: actions/upload-artifact@v4
+        with:
+          name: brcmfmac-modules
+          path: out-mods/*.ko
+          retention-days: 14
